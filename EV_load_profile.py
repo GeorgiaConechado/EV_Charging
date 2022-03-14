@@ -9,7 +9,7 @@ EV_inputs_example = { #EV model details example
 }
 
 traffic_inputs_2020 = {
-    'year': 2030, # the year for analysis
+    'year': 2020, # the year for analysis
     'traffic': 28,  #forecast mean daily EV traffic volume (two way)
     'traffic_var':0.4, #perc variation in traffic each day
     'stop_prob':0.2, #probability of car passing by to stop
