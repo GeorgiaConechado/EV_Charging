@@ -9,7 +9,7 @@ EV_inputs_example = { #EV model details example
     'battery_size': 75, #kWh - this not being used atm
 }
 
-traffic_inputs_2020 = {
+traffic_inputs_2030 = {
     'year': 2030, # the year for analysis
     'traffic_mu': 28,  #forecast mean daily EV traffic volume (two way)
     'traffic_sigma':5, #standard deviation for the traffic volume
@@ -55,4 +55,4 @@ def probability(weightings):
         p.append(weightings[i]/total)
     return p
 
-load_profile(EV_inputs_example,traffic_inputs_2020)
+load_profile(EV_inputs_example,traffic_inputs_2030)
