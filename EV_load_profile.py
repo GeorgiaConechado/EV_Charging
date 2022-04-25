@@ -2,6 +2,7 @@ import datetime as dt
 from doctest import Example
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
 EV_inputs_example = { #EV model details example
     'AC_charge_rate':11, #max charge rate kW
@@ -41,7 +42,7 @@ def load_profile(EV_inputs, traffic_inputs): #generates timeseries csv
 
     df = pd.DataFrame(load, index = dates, columns = times)
     df.to_csv('timeseries/' + str(traffic_inputs['year']) + '_EV_load_profile')
-    return    
+    return df  
 
 def randomise_travel(traffic_inputs): #simplest version - random times of day
     traffic = np.round(np.random.normal(loc= traffic_inputs['traffic_mu'], scale = traffic_inputs['traffic_sigma']))
@@ -55,4 +56,42 @@ def probability(weightings):
         p.append(weightings[i]/total)
     return p
 
-load_profile(EV_inputs_example,traffic_inputs_2030)
+#load_profile(EV_inputs_example,traffic_inputs_2030)
+
+def graph_profile1(file, n = 1, title = None):
+    df = pd.read_csv('timeseries\\'+file)
+    fig, ax = plt.subplots()
+    # We need to draw the canvas, otherwise the labels won't be positioned and 
+    # won't have values yet.
+    fig.canvas.draw()
+    ax.set_xticklabels(df.columns[1:])
+    plt.step(range(24), df.iloc[0,1:])
+    plt.show()
+
+def graph_profile(file, n = 1, title = None):
+    df = pd.read_csv('timeseries\\'+file)
+    fig, (ax1, ax2,ax3,ax4,ax5) = plt.subplots(5,1, sharey = True)
+    plt.setp((ax1, ax2,ax3,ax4,ax5), xticks=(range(24)))
+    fig.canvas.draw()
+    ax1.set_xticklabels(df.columns[1:])
+    ax1.step(range(24), df.iloc[0,1:])
+    ax2.set_xticklabels(df.columns[1:])
+    ax2.step(range(24), df.iloc[1,1:])
+    ax3.set_xticklabels(df.columns[1:])
+    ax3.step(range(24), df.iloc[2,1:])
+    ax4.set_xticklabels(df.columns[1:])
+    ax4.step(range(24), df.iloc[3,1:])
+    ax5.set_xticklabels(df.columns[1:])
+    ax5.step(range(24), df.iloc[4,1:])
+
+    ax1.set_title('01/01/30',fontsize=10)
+    ax2.set_title('02/01/30',fontsize=10)
+    ax3.set_title('03/01/30',fontsize=10)
+    ax4.set_title('04/01/30',fontsize=10)
+    ax5.set_title('05/01/30',fontsize=10)
+    fig.tight_layout() 
+    # plt.xticks(rotation = 45)
+    plt.show()
+
+
+graph_profile('2030_EV_load_profile')
