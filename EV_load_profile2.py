@@ -71,21 +71,31 @@ def optimise_chargers (yearly_arrival_times, init_chargers, allow_max_wait_time,
     '''
     num_chargers = init_chargers
     wait_EV = char_profile(yearly_arrival_times,num_chargers)[1]
-    # print(wait_EV)
-    max_wait_time = np.max(np.max(np.max(wait_EV)))
+    print(wait_EV)[0]
+    #max_wait_time = np.max(np.max(np.max(wait_EV)))
     # print(max_wait_time)
-    # max_wait_time = max([item for sublist in wait_EV for item in sublist])
+    flat_wait_EV = [item for sublist in [item for sublist in wait_EV for item in sublist] for item in sublist]
+    if flat_wait_EV != []:
+        max_wait_time = max(flat_wait_EV)
+    else:
+        max_wait_time = 0
     # print(max_wait_time)
 
-    allow_max_daily_wait_EV = 0
-    # for i in range (365):
-    #     print(i)
-    #     print(wait_EV[i])
+    max_daily_wait_EV = 0
+    for i in range (365):
+        #print(wait_EV[i])
+        daily_wait_EV = 0
+        for j in range(24):
+            daily_wait_EV = daily_wait_EV + len(wait_EV[i][j])
+        max_daily_wait_EV = max(daily_wait_EV,max_daily_wait_EV)
+    #print(max_daily_wait_EV)
     
     #while 
 
     return num_chargers
 
 yearly_arrival_times = arrival_times(30,5,hourly_weight)
-print(yearly_arrival_times)
-optimise_chargers(yearly_arrival_times,3,1,5)
+#print(yearly_arrival_times)
+optimise_chargers(yearly_arrival_times,4,1,5)
+
+#need to fix issue if waitEV list is empty
