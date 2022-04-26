@@ -2,7 +2,8 @@ import datetime as dt
 from doctest import Example
 from turtle import shape
 import numpy as np
-import pandas as pd
+from torch import int8
+# import pandas as pd
 
 hourly_weight = [2,2,1,1,1,1,3,7,14,20,23,27,26,25,23,17,13,8,5,3,3,2,2,2] #example taken from stuart highway evernergi report
 
@@ -34,7 +35,7 @@ def char_profile (yearly_arrival_times, num_chargers):
     for i in range(len(yearly_arrival_times)):
         daily_char = []
         daily_times = yearly_arrival_times[i]
-        prev_wait_EV = []
+        wait_EV_record = []
         for j in range(len(daily_times)):
             #print(j)
             arriving_EVs = daily_times[j]
@@ -42,7 +43,7 @@ def char_profile (yearly_arrival_times, num_chargers):
             wait_EV_to_char = min(num_chargers, len(current_wait_EV)) #number of EVs which were waiting but will be charged in this timestep
             #print('wait EV to char:', wait_EV_to_char)
 
-            prev_wait_EV.append([current_wait_EV.pop(0) for idx in range(wait_EV_to_char)]) #those EVs are no longer waiting but their wait time is recorded
+            wait_EV_record.append([current_wait_EV.pop(0) for idx in range(wait_EV_to_char)]) #those EVs are no longer waiting but their wait time is recorded
 
             current_wait_EV = [x+1 for x in current_wait_EV] #add one hour wait to all remaining waiting EVs
             #print('current wait EV:', current_wait_EV)
@@ -57,9 +58,14 @@ def char_profile (yearly_arrival_times, num_chargers):
             for n in range (arrive_EV_to_wait):
                 current_wait_EV.append(1) #add the new waiting EVs with a wait time of 1 hour
             #print('final current waiting EV', current_wait_EV)
-        total_prev_wait_EV.append(prev_wait_EV)
+        wait_EV_record.append(current_wait_EV)
+        total_prev_wait_EV.append(wait_EV_record)
         char_profile.append(daily_char)
     #print(len(total_prev_wait_EV[0]))
+    if (len(current_wait_EV) > 0 ):
+        print("never charged ev wait times: " +  str(current_wait_EV))
+    
+    total_prev_wait_EV[1].append(current_wait_EV)
     return char_profile, total_prev_wait_EV
 
 #char_profile(arrival_times(30,5,hourly_weight),3)
@@ -70,24 +76,40 @@ def optimise_chargers (yearly_arrival_times, init_chargers, allow_max_wait_time,
     allow_max_daily_wait_EV = maximum allowable number of EVs which have to wait over any given day
     '''
     num_chargers = init_chargers
-    wait_EV = char_profile(yearly_arrival_times,num_chargers)[1]
-    print(wait_EV)[0]
-    #max_wait_time = np.max(np.max(np.max(wait_EV)))
-    # print(max_wait_time)
-    flat_wait_EV = [item for sublist in [item for sublist in wait_EV for item in sublist] for item in sublist]
-    if flat_wait_EV != []:
-        max_wait_time = max(flat_wait_EV)
-    else:
-        max_wait_time = 0
-    # print(max_wait_time)
+    while True:
+        
+        print("num chargers " + str(num_chargers))
+        # wait_EV_Test = char_profile(yearly_arrival_times,num_chargers)[1]
+        # print(np.asarray(wait_EV_Test))
+        # wait_EV = np.array(char_profile(yearly_arrival_times,num_chargers)[1],dtype=object)
+        wait_EV = char_profile(yearly_arrival_times,num_chargers)[1]
+        print()
+        # print("\n\n")
+        print(wait_EV)
+        # print(wait_EV)[0]
+        #max_wait_time = np.max(np.max(np.max(wait_EV)))
+        # print(max_wait_time)
+        flat_wait_EV = [item for sublist in [item for sublist in wait_EV for item in sublist] for item in sublist]
+        if flat_wait_EV != []:
+            max_wait_time = max(flat_wait_EV)
+        else:
+            max_wait_time = 0
+        # print(wait_EV)
+        # max_wait_time = np.max(wait_EV.flatten().flatten())
+        # print(wait_EV.flatten())
+        # print(max_wait_time)
 
-    max_daily_wait_EV = 0
-    for i in range (365):
-        #print(wait_EV[i])
-        daily_wait_EV = 0
-        for j in range(24):
-            daily_wait_EV = daily_wait_EV + len(wait_EV[i][j])
-        max_daily_wait_EV = max(daily_wait_EV,max_daily_wait_EV)
+        max_daily_wait_EV = 0
+        for i in range (365):
+            #print(wait_EV[i])
+            daily_wait_EV = 0
+            for j in range(24):
+                daily_wait_EV = daily_wait_EV + len(wait_EV[i][j])
+            max_daily_wait_EV = max(daily_wait_EV,max_daily_wait_EV)
+
+        if (max_wait_time <= allow_max_wait_time) and (max_daily_wait_EV<=allow_max_daily_wait_EV):
+            break
+        num_chargers = num_chargers + 1
     #print(max_daily_wait_EV)
     
     #while 
@@ -96,6 +118,6 @@ def optimise_chargers (yearly_arrival_times, init_chargers, allow_max_wait_time,
 
 yearly_arrival_times = arrival_times(30,5,hourly_weight)
 #print(yearly_arrival_times)
-optimise_chargers(yearly_arrival_times,4,1,5)
+optimise_chargers(yearly_arrival_times,1,1,5)
 
 #need to fix issue if waitEV list is empty
