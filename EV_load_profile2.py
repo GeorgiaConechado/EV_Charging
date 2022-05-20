@@ -18,7 +18,7 @@ def arrival_times(traffic_mu, traffic_sigma, hourly_weight, stop_prob = 1):
     trafficQuants = np.linspace(0.0,0.997,365)
     traffic = np.round(np.quantile(trafficBigArray,trafficQuants))
     traffic[traffic < 0] = 0
-    print(traffic)
+    #print(traffic)
     np.random.shuffle(traffic)    
     for i in range (365):
         daily = []
@@ -68,8 +68,8 @@ def char_profile (yearly_arrival_times, num_chargers):
         wait_EV_record.append(current_wait_EV)
         total_prev_wait_EV.append(wait_EV_record)
         char_profile.append(daily_char)
-    if (len(current_wait_EV) > 0 ):
-        print("never charged ev wait times: " +  str(current_wait_EV))
+    # if (len(current_wait_EV) > 0 ):
+    #     print("never charged ev wait times: " +  str(current_wait_EV))
     
     total_prev_wait_EV[1].append(current_wait_EV)
     return char_profile, total_prev_wait_EV
@@ -114,6 +114,7 @@ def optimise_chargers (yearly_arrival_times, init_chargers, allow_max_wait_time,
         if (max_wait_time <= allow_max_wait_time) and (max_daily_wait_EV<=allow_max_daily_wait_EV):
             break
         num_chargers = num_chargers + 1
+
     #print(max_daily_wait_EV)
     
     #while 
@@ -133,3 +134,9 @@ def save_timeseries (data, year, filename = None):
     df = pd.DataFrame(data, index = dates, columns = times)
     df.to_csv(filename + str(year))
     return df  
+
+def load_profile (yearly_arrival_times, charge_rate, num_chargers):
+    charge_profile = np.array(char_profile(yearly_arrival_times,num_chargers)[0], dtype=object)
+    #print(charge_profile)
+    load_profile = charge_rate*charge_profile
+    return load_profile

@@ -58,40 +58,33 @@ def probability(weightings):
 
 #load_profile(EV_inputs_example,traffic_inputs_2030)
 
-def graph_profile1(file, n = 1, title = None):
-    df = pd.read_csv('timeseries\\'+file)
-    fig, ax = plt.subplots()
-    # We need to draw the canvas, otherwise the labels won't be positioned and 
-    # won't have values yet.
-    fig.canvas.draw()
-    ax.set_xticklabels(df.columns[1:])
-    plt.step(range(24), df.iloc[0,1:])
-    plt.show()
+# def graph_profile1(file, n = 1, title = None):
+#     df = pd.read_csv('timeseries\\'+file)
+#     fig, ax = plt.subplots()
+#     # We need to draw the canvas, otherwise the labels won't be positioned and 
+#     # won't have values yet.
+#     fig.canvas.draw()
+#     ax.set_xticklabels(df.columns[1:])
+#     plt.step(range(24), df.iloc[0,1:])
+#     plt.show()
 
 def graph_profile(file, n = 1, title = None):
-    df = pd.read_csv('timeseries\\'+file)
+    df = pd.read_csv(file)
+
     fig, (ax1, ax2,ax3,ax4,ax5) = plt.subplots(5,1, sharey = True)
     plt.setp((ax1, ax2,ax3,ax4,ax5), xticks=(range(24)))
+    axes = [ax1, ax2, ax3, ax4, ax5]
     fig.canvas.draw()
-    ax1.set_xticklabels(df.columns[1:])
-    ax1.step(range(24), df.iloc[0,1:])
-    ax2.set_xticklabels(df.columns[1:])
-    ax2.step(range(24), df.iloc[1,1:])
-    ax3.set_xticklabels(df.columns[1:])
-    ax3.step(range(24), df.iloc[2,1:])
-    ax4.set_xticklabels(df.columns[1:])
-    ax4.step(range(24), df.iloc[3,1:])
-    ax5.set_xticklabels(df.columns[1:])
-    ax5.step(range(24), df.iloc[4,1:])
 
-    ax1.set_title('01/01/30',fontsize=10)
-    ax2.set_title('02/01/30',fontsize=10)
-    ax3.set_title('03/01/30',fontsize=10)
-    ax4.set_title('04/01/30',fontsize=10)
-    ax5.set_title('05/01/30',fontsize=10)
+    for i in range (len(axes)):
+        axes[i].set_xticklabels(df.columns[1:])
+        axes[i].step(range(24), df.iloc[i,1:], where = 'post')
+        [l.set_visible(False) for (i,l) in enumerate(axes[i].xaxis.get_ticklabels()) if i % 6 != 0]
+        axes[i].set_title('0'+str(i)+'/01/25',fontsize=10)
+
     fig.tight_layout() 
     # plt.xticks(rotation = 45)
     plt.show()
 
 
-graph_profile('2030_EV_load_profile')
+graph_profile('arrival_times\\2025')

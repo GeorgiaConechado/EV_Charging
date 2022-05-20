@@ -7,12 +7,7 @@ def traffic_data(year, season = 'Peak Day') :
     filename = 'traffic_data\\SA_Traffic_Model_Far_North_'+str(year)+'.csv'
     df = pd.read_csv(filename)
     print(df[season])
-    # mu = 
-    # sigma = 
-    # weightings = df[season].tolist()
-    # return {"mu":mu, "sigma":sigma, "weightings": weightings}
 
-#traffic_data(2030)
 
 year = 2025
 season = 'Peak Day'
