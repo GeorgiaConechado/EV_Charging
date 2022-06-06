@@ -5,8 +5,6 @@ import numpy as np
 import pandas as pd
 import scipy.stats as stats 
 
-# hourly_weight = [2,2,1,1,1,1,3,7,14,20,23,27,26,25,23,17,13,8,5,3,3,2,2,2] #example taken from stuart highway evernergi report
-
 def arrival_times(traffic_mu, traffic_sigma, hourly_weight, stop_prob = 1):
     '''
     Determine hourly arrival times over a year. Uses a near-ideal normal distribution for day-to-day variation, and a given distribution profile for hour-to-hour variation.
