@@ -1,4 +1,4 @@
-from EV_load_profile2 import *
+from EV_Charging import *
 import pandas as pd
 
 year = 2025
