@@ -8,25 +8,19 @@ import scipy.stats as stats
 # hourly_weight = [2,2,1,1,1,1,3,7,14,20,23,27,26,25,23,17,13,8,5,3,3,2,2,2] #example taken from stuart highway evernergi report
 
 def arrival_times(traffic_mu, traffic_sigma, hourly_weight, stop_prob = 1):
+    '''
+    Determine hourly arrival times over a year. Uses a near-ideal normal distribution for day-to-day variation, and a given distribution profile for hour-to-hour variation.
+    '''
     yearly_arrival_times = []
     stdMax = 2.78
     trafficLin = np.linspace(traffic_mu -stdMax*traffic_sigma,traffic_mu+stdMax*traffic_sigma,365)
     trafficBigArray = np.random.normal(loc = traffic_mu, scale = traffic_sigma,size=1000000)
-    # print(trafficLin)
-    # print(traffic_mu)
-    # traffic = stats.norm.pdf(trafficLin,51,traffic_sigma)
     trafficQuants = np.linspace(0.0,0.997,365)
     traffic = np.round(np.quantile(trafficBigArray,trafficQuants))
     traffic[traffic < 0] = 0
-    #print(traffic)
     np.random.shuffle(traffic)    
     for i in range (365):
         daily = []
-        # traffic = np.round(np.random.normal(loc = traffic_mu, scale = traffic_sigma))
-        
-        # print(traffic)
-        # if traffic <0:
-        #     traffic = 0
         arrival_times = np.random.choice(24,size=int(traffic[i]*stop_prob),p=probability(hourly_weight))
         for j in range (24):
             daily.append(np.count_nonzero(arrival_times == j))
@@ -74,8 +68,6 @@ def char_profile (yearly_arrival_times, num_chargers):
     total_prev_wait_EV[1].append(current_wait_EV)
     return char_profile, total_prev_wait_EV
 
-#char_profile(arrival_times(30,5,hourly_weight),3)
-
 def optimise_chargers (yearly_arrival_times, init_chargers, allow_max_wait_time, allow_max_daily_wait_EV):
     '''
     allow_max_wait_time = maxmimum allowable length of time for any given EV to wait in hours
@@ -83,29 +75,15 @@ def optimise_chargers (yearly_arrival_times, init_chargers, allow_max_wait_time,
     '''
     num_chargers = init_chargers
     while True:
-        
-        #print("num chargers " + str(num_chargers))
-        # wait_EV_Test = char_profile(yearly_arrival_times,num_chargers)[1]
-        # print(np.asarray(wait_EV_Test))
-        # wait_EV = np.array(char_profile(yearly_arrival_times,num_chargers)[1],dtype=object)
         wait_EV = char_profile(yearly_arrival_times,num_chargers)[1]
-
-        # print(wait_EV)[0]
-        #max_wait_time = np.max(np.max(np.max(wait_EV)))
-        # print(max_wait_time)
         flat_wait_EV = [item for sublist in [item for sublist in wait_EV for item in sublist] for item in sublist]
         if flat_wait_EV != []:
             max_wait_time = max(flat_wait_EV)
         else:
             max_wait_time = 0
-        # print(wait_EV)
-        # max_wait_time = np.max(wait_EV.flatten().flatten())
-        # print(wait_EV.flatten())
-        # print(max_wait_time)
 
         max_daily_wait_EV = 0
         for i in range (365):
-            #print(wait_EV[i])
             daily_wait_EV = 0
             for j in range(24):
                 daily_wait_EV = daily_wait_EV + len(wait_EV[i][j])
@@ -115,15 +93,7 @@ def optimise_chargers (yearly_arrival_times, init_chargers, allow_max_wait_time,
             break
         num_chargers = num_chargers + 1
 
-    #print(max_daily_wait_EV)
-    
-    #while 
-
     return num_chargers
-
-# yearly_arrival_times = arrival_times(30,5,hourly_weight)
-# #print(yearly_arrival_times)
-# optimise_chargers(yearly_arrival_times,1,1,5)
 
 def save_timeseries (data, year, filename = None):
     times = [(dt.time(i).strftime('%H:%M')) for i in range(24)]
@@ -137,6 +107,5 @@ def save_timeseries (data, year, filename = None):
 
 def load_profile (yearly_arrival_times, charge_rate, num_chargers):
     charge_profile = np.array(char_profile(yearly_arrival_times,num_chargers)[0], dtype=object)
-    #print(charge_profile)
     load_profile = charge_rate*charge_profile
     return load_profile

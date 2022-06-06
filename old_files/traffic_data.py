@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-from EV_load_profile2 import *
+from EV_Charging import *
 
 
 def traffic_data(year, season = 'Peak Day') :
@@ -36,3 +36,27 @@ for i in range (365):
 
 print(max_traffic)
 print(df['Peak Day'].sum())
+
+# traffic_mu_list = np.arange(0,100,2)
+
+# num_chargers_list = []
+
+# for i in range(len(traffic_mu_list)):
+#     traffic_mu = traffic_mu_list[i]
+#     traffic_sigma = traffic_mu*sigma/mu
+
+#     yearly_arrival_times = arrival_times(traffic_mu, traffic_sigma, hourly_weightings, 0.5)
+#     filename = 'arrival_times\\trend\\'+str(i)+'_'
+#     save_timeseries(yearly_arrival_times,2025,filename)
+#     num_chargers = optimise_chargers(yearly_arrival_times,1,1,100)
+#     num_chargers_list.append(num_chargers)
+
+# import matplotlib.pyplot as plt
+
+# plt.plot(traffic_mu_list,num_chargers_list)
+# #plt.ylabel('some numbers')
+# plt.show()
+# plt.savefig('graphs\\num_chargers')
+
+# # load = load_profile(yearly_arrival_times, 100, num_chargers)
+# # save_timeseries(load,2025,'load_profile\\')
